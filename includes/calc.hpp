@@ -47,13 +47,7 @@ class calc{
 
     float** tranposta();
 
-    void setMatrix(float** matriz, int linhas, int colunas) {
-    mat = matriz;
-    this->linhas = linhas;
-    this->colunas = colunas;
-    exibirmatriz();
-    }
-    
+    void setMatrix(float** matriz, int linhas, int colunas);
 
     calc(){
     }

@@ -20,7 +20,7 @@ void calc::instanciarMatriz(){
       numCol=colunas;
 }
 
-//meto entrada de dados
+//metodo entrada de dados
 void calc::preencher() { 
 
     numLin=linhas;
@@ -190,8 +190,6 @@ float calc::mediana(int index) {
 }
 
 
-
-
 //método para a transposta
 float** calc::tranposta() {
 
@@ -210,3 +208,10 @@ float** calc::tranposta() {
     return transposta;
 }
 
+//Método para selecionar matriz e conectar com a classe read_csv
+void calc::setMatrix(float** matriz, int linhas, int colunas) {
+    mat = matriz;
+    this->linhas = linhas;
+    this->colunas = colunas;
+    exibirmatriz();
+}

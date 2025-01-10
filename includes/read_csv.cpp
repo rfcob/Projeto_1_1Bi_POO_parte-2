@@ -10,7 +10,7 @@ using namespace std;
 
 
 // metodos numero de linhas e colunas________________________________________________________________________________________________________
-int read_csv::get_nroLinhas(){
+int read_csv::get_nbrLines(){
     return nroLinhas;
 }
 
@@ -22,19 +22,19 @@ int** read_csv::mydataInt(){
     return data;
 }
 
-int read_csv::get_nroColunas(){
+int read_csv::get_nbrCols(){
     return nroColunas;
 }
 
 
-/*float** read_csv::getFloatMatrix() {
+float** read_csv::get_floatMatrix() {
     return sheet;
 }
 
-int** read_csv::getIntMatrix() {
+int** read_csv::get_intMatrix() {
     return data;
 }
-*/
+
 
 //metodo imprime a matriz/dataframe__________________________________________________________________________________________________________
 

@@ -73,12 +73,12 @@ class read_csv{
     void show();
     int** mydataInt();
     float** mydataFloat();
-    //float** getFloatMatrix();
-    //int** getIntMatrix();
+    float** get_floatMatrix();
+    int** get_intMatrix();
     int tamanho(int skip_line);
     int tamanho(const string& filename, int skip_line);
-    int get_nroLinhas();
-    int get_nroColunas();
+    int get_nbrLines();
+    int get_nbrCols();
     void* toList(int skip_line);
     void* toList(const string& filename, int skip_line);
     void imprimeData() const;

@@ -32,10 +32,10 @@ int main(){
 
     // visualizando o numero de linhas e colunas
     cout << endl;
-    cout << "Numero de Linhas do base: "<< base.get_nroLinhas();
+    cout << "Numero de Linhas do base: "<< base.get_nbrLines();
     
     cout << endl;
-    cout << "Numero de colunas do base: " << base.get_nroColunas() << endl;
+    cout << "Numero de colunas do base: " << base.get_nbrCols() << endl;
 
     // visualizando a matriz de inteiros e/ou float
     cout << endl;
@@ -55,7 +55,7 @@ int main(){
 
     calc knn;
 
-    knn.setMatrix(base.mydataFloat(), base.get_nroLinhas(), base.get_nroColunas()); 
+    knn.setMatrix(base.get_floatMatrix(), base.get_nbrLines(), base.get_nbrCols()); 
     // Utilizando o método mediaDeclar da classe knn 
     cout<<endl;
     //cout << "Media da coluna 3 é " <<  knn.mediaDeclar(base.mydataFloat(), 2) << endl << "\n";
