@@ -75,12 +75,12 @@ class read_csv{
     float** mydataFloat();
     //float** getFloatMatrix();
     //int** getIntMatrix();
-    int tamanho();
-    int tamanho(const string& filename);
+    int tamanho(int skip_line);
+    int tamanho(const string& filename, int skip_line);
     int get_nroLinhas();
     int get_nroColunas();
-    void* toList();
-    void* toList(const string& filename);
+    void* toList(int skip_line);
+    void* toList(const string& filename, int skip_line);
     void imprimeData() const;
     float mediaDeclar(int index);
 

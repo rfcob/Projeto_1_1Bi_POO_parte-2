@@ -51,6 +51,7 @@ class calc{
     mat = matriz;
     this->linhas = linhas;
     this->colunas = colunas;
+    exibirmatriz();
     }
     
 

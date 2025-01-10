@@ -56,7 +56,7 @@ void read_csv::imprimeData() const{
 }
 
 //metodo calcula o tamanho do arquivo csv____________________________________________________________________________________________________
-int read_csv::tamanho(const string& filename) {
+int read_csv::tamanho(const string& filename, int skip_line) {
     
     ifstream file(filename);
     if (!file.is_open()) {
@@ -77,7 +77,8 @@ int read_csv::tamanho(const string& filename) {
             nroColunas = cols;
         }
     }
-    //file.close();
+    nroLinhas=nroLinhas-skip_line;
+    file.close();
 
     return 0;
 }
@@ -86,7 +87,7 @@ int read_csv::tamanho(const string& filename) {
 
 // precisa ser reavaliada a utilidade dessa função uma vez que não tem objeto instanciado sem o nome do arquivo
 
-int read_csv::tamanho() {
+int read_csv::tamanho(int skip_line) {
     
     ifstream file(nomeArquivo);
     if (!file.is_open()) {
@@ -107,15 +108,16 @@ int read_csv::tamanho() {
             nroColunas = cols;
         }
     }
+    nroLinhas=nroLinhas-skip_line;
     file.close();
     return 0;
 }
 
 
 //Medoto convertendo para lista(arrays) o arquivo csv________________________________________________________________________________________________________________
-void* read_csv::toList(const string& filename) {
+void* read_csv::toList(const string& filename, int skip_line) {
     // Determina o tamanho
-    tamanho(nomeArquivo);
+    tamanho(nomeArquivo, skip_line);
 
     if (tipoArquivo == "int") {
         // Alocando memória e inicializando a matriz com zeros//não funcionava sem isso
@@ -205,9 +207,9 @@ void* read_csv::toList(const string& filename) {
 
 
 //Medoto convertendo para lista(arrays) o arquivo csv________________________________________________________________________________________________________________
-void* read_csv::toList() {
+void* read_csv::toList(int skip_line) {
     // Determina o tamanho
-    tamanho(nomeArquivo);
+    tamanho(nomeArquivo, skip_line);
 
     if (tipoArquivo == "int") {
         // Alocando memória e inicializando a matriz com zeros//não funcionava sem isso
