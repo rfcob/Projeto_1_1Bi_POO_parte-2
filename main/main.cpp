@@ -6,17 +6,19 @@
 #include <iomanip>
 #include "../includes/calc.cpp"
 #include "../includes/read_csv.cpp"
+#include "../includes/knn.cpp"
 
 
 using namespace std; 
 
-
+/*
 int main(){
     //instanciando objeto________________________________________
 
     //string file_int = "../data/features-Aula 13 - Projeto 1 - dataset1.csv"; // nomeando arquivo (tipo inteiro)
     //string file_float = "../data/features-Aula 13 - Projeto 1 - dataset2.csv"; // nomeando arquivo (tipo float)
     read_csv base("../data/features-Aula 13 - Projeto 1 - dataset2.csv", "float");
+    read_csv base("/home/rafael/Documentos/GitHub repositories/Projeto_1_1Bi_POO_parte-2/data/label-Aula 13 - Projeto 1 - dataset2.csv", "float");
     //read_csv label;
     //read_csv fit;
     
@@ -63,4 +65,42 @@ int main(){
     //knn.exibirmatriz();
 
     return 0;
-} 
+} */
+
+
+
+
+
+
+int main() {
+    string dataFile = "../data/features-Aula 13 - Projeto 1 - dataset2.csv"; // Substitua pelo caminho do arquivo de dados
+    string rotFile = "/home/rafael/Documentos/GitHub repositories/Projeto_1_1Bi_POO_parte-2/data/label-Aula 13 - Projeto 1 - dataset2.csv"; // Substitua pelo caminho do arquivo de rótulos
+
+    // Leitura dos dados
+    read_csv leitorData(dataFile, "float", ',');
+    leitorData.toList(1); // Ignora o cabeçalho
+    float** data = leitorData.get_floatMatrix();
+    int lines = leitorData.get_nbrLines();
+    int cols = leitorData.get_nbrCols();
+
+    read_csv leitorRot(rotFile, "int", ',');
+    leitorRot.toList(1);
+    int* rot = leitorRot.get_intMatrix()[0]; // Obtém o vetor de rótulos
+
+    // Instancia o modelo
+    KNNModel modelo(5);
+    modelo.fit(data, rot, lines, cols);
+
+    // Testa o modelo
+    int* predicoes = modelo.predict(data, lines); // Aqui usando os mesmos dados para simplicidade
+
+    // Exibe as previsões
+    cout << "Previsões:" << endl;
+    for (int i = 0; i < lines; i++) {
+        cout << "Exemplo " << i + 1 << ": Classe " << predicoes[i] << endl;
+    }
+
+    delete[] predicoes;
+
+    return 0;
+}
