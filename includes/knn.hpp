@@ -1,4 +1,3 @@
-// knn.hpp
 #ifndef KNN_HPP
 #define KNN_HPP
 
@@ -35,4 +34,3 @@ private:
 };
 
 #endif
-

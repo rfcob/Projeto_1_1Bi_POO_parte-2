@@ -1,5 +1,4 @@
 
-
 #include <fstream> 
 #include <iostream> 
 #include <sstream> 
@@ -8,8 +7,52 @@
 #include "../includes/read_csv.cpp"
 #include "../includes/knn.cpp"
 
-
 using namespace std; 
+
+#include "../includes/knn.hpp"
+
+using std::cout;
+using std::endl;
+using std::vector;
+
+
+int main() {
+
+    //instanciando objeto
+    KNN knn(3);
+
+    //chamando o metodo fit (que chama o read_csv)
+    knn.fit_from_files("/home/cobo/Documentos/Github - repositories/Projeto_1_1Bi_POO_parte-2/data/features-Aula 13 - Projeto 1 - dataset2.csv", "/home/cobo/Documentos/Github - repositories/Projeto_1_1Bi_POO_parte-2/data/label-Aula 13 - Projeto 1 - dataset2.csv");
+
+    //sepanando conhecimento de teste
+    knn.split_data(0.3);
+
+    //chamndo o metodo predict (calcula distancia e gera as classificacoes)
+    vector<int> predictions = knn.predict_test();
+
+    //pegando os labels rotulados
+    const vector<int>& test_labels = knn.get_test_labels();
+
+    //calculando a acuracioa
+    float accuracy = knn.calculate_accuracy(predictions, test_labels);
+
+
+    cout << "Classificações:" << endl;
+    for (int label : predictions) {
+        cout << label << " ";
+    }
+    cout << endl;
+
+    cout << "Acuracia: " << accuracy * 100 << "%" << endl;
+
+    return 0;
+}
+
+
+
+// NÂO ESTA TOTALMENTE INTEGRADA AS CLASSES
+
+
 
 /*
 int main(){
@@ -22,8 +65,6 @@ int main(){
     //read_csv label;
     //read_csv fit;
     
-
-
 
     // Visualizando os dados ainda no formato string
     cout << " Visualizando: " << endl << "\n";
@@ -67,34 +108,3 @@ int main(){
     return 0;
 } */
 
-
-
-
-
-
-using std::cout;
-using std::endl;
-using std::vector;
-
-int main() {
-    KNN knn(3);
-
-    knn.fit_from_files("/home/cobo/Documentos/Github - repositories/Projeto_1_1Bi_POO_parte-2/data/features-Aula 13 - Projeto 1 - dataset2.csv", "/home/cobo/Documentos/Github - repositories/Projeto_1_1Bi_POO_parte-2/data/label-Aula 13 - Projeto 1 - dataset2.csv");
-
-    knn.split_data(0.3);
-
-    vector<int> predictions = knn.predict_test();
-    const vector<int>& test_labels = knn.get_test_labels();
-
-    float accuracy = knn.calculate_accuracy(predictions, test_labels);
-
-    cout << "Predictions:" << endl;
-    for (int label : predictions) {
-        cout << label << " ";
-    }
-    cout << endl;
-
-    cout << "Accuracy: " << accuracy * 100 << "%" << endl;
-
-    return 0;
-}

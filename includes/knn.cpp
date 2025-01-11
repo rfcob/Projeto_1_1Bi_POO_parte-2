@@ -1,4 +1,3 @@
-// knn.cpp
 #include "knn.hpp"
 #include "read_csv.h"
 #include <cmath>
@@ -141,4 +140,3 @@ float KNN::calculate_distance(const vector<float> &a, const vector<float> &b) {
     }
     return std::sqrt(sum);
 }
-
