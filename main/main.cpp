@@ -72,35 +72,29 @@ int main(){
 
 
 
+using std::cout;
+using std::endl;
+using std::vector;
+
 int main() {
-    string dataFile = "../data/features-Aula 13 - Projeto 1 - dataset2.csv"; // Substitua pelo caminho do arquivo de dados
-    string rotFile = "/home/rafael/Documentos/GitHub repositories/Projeto_1_1Bi_POO_parte-2/data/label-Aula 13 - Projeto 1 - dataset2.csv"; // Substitua pelo caminho do arquivo de rótulos
+    KNN knn(3);
 
-    // Leitura dos dados
-    read_csv leitorData(dataFile, "float", ',');
-    leitorData.toList(1); // Ignora o cabeçalho
-    float** data = leitorData.get_floatMatrix();
-    int lines = leitorData.get_nbrLines();
-    int cols = leitorData.get_nbrCols();
+    knn.fit_from_files("/home/cobo/Documentos/Github - repositories/Projeto_1_1Bi_POO_parte-2/data/features-Aula 13 - Projeto 1 - dataset2.csv", "/home/cobo/Documentos/Github - repositories/Projeto_1_1Bi_POO_parte-2/data/label-Aula 13 - Projeto 1 - dataset2.csv");
 
-    read_csv leitorRot(rotFile, "int", ',');
-    leitorRot.toList(1);
-    int* rot = leitorRot.get_intMatrix()[0]; // Obtém o vetor de rótulos
+    knn.split_data(0.3);
 
-    // Instancia o modelo
-    KNNModel modelo(5);
-    modelo.fit(data, rot, lines, cols);
+    vector<int> predictions = knn.predict_test();
+    const vector<int>& test_labels = knn.get_test_labels();
 
-    // Testa o modelo
-    int* predicoes = modelo.predict(data, lines); // Aqui usando os mesmos dados para simplicidade
+    float accuracy = knn.calculate_accuracy(predictions, test_labels);
 
-    // Exibe as previsões
-    cout << "Previsões:" << endl;
-    for (int i = 0; i < lines; i++) {
-        cout << "Exemplo " << i + 1 << ": Classe " << predicoes[i] << endl;
+    cout << "Predictions:" << endl;
+    for (int label : predictions) {
+        cout << label << " ";
     }
+    cout << endl;
 
-    delete[] predicoes;
+    cout << "Accuracy: " << accuracy * 100 << "%" << endl;
 
     return 0;
 }

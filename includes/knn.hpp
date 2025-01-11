@@ -1,39 +1,38 @@
+// knn.hpp
 #ifndef KNN_HPP
 #define KNN_HPP
 
-#include "calc.hpp"
-#include "read_csv.h"
+#include <vector>
 #include <string>
+#include "read_csv.h"
 
-class KNNModel {
+using std::vector;
+using std::string;
+
+class KNN {
 private:
-    float** treino;
-    int* rotTreino;
-    int linesTreino;
-    int cols;
-    int k; // Número de vizinhos
-    int numClasses; 
+    int k;
+    vector<vector<float>> training_data;
+    vector<int> training_labels;
+    vector<vector<float>> test_data;
+    vector<int> test_labels;
 
 public:
-    
-    KNNModel() : treino(nullptr), rotTreino(nullptr), linesTreino(0), cols(0), k(5) {}
+    KNN();
+    KNN(int k);
+    ~KNN();
 
-    KNNModel(int vizinhos) : treino(nullptr), rotTreino(nullptr), linesTreino(0), cols(0), k(vizinhos) {}
-  
-    ~KNNModel() {
+    void fit(const vector<vector<float>> &data, const vector<int> &labels);
+    void fit_from_files(const string &data_file, const string &label_file);
+    void split_data(float test_ratio);
+    vector<int> predict(const vector<vector<float>> &data);
+    vector<int> predict_test();
+    const vector<int>& get_test_labels() const;
+    float calculate_accuracy(const vector<int> &predictions, const vector<int> &true_labels);
 
-        for (int i = 0; i < linesTreino; i++) {
-            delete[] treino[i];
-        }
-
-        delete[] treino;
-
-        delete[] rotTreino;
-    }
-
-    // Métodos principais
-    void fit(float** data, int* rot, int lines, int cols); // Armazena dados de treino
-    int* predict(float** teste, int linesTeste); // Classifica exemplos no conjunto de teste
+private:
+    float calculate_distance(const vector<float> &a, const vector<float> &b);
 };
 
 #endif
+

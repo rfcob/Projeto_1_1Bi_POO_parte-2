@@ -1,105 +1,144 @@
-
+// knn.cpp
 #include "knn.hpp"
-#include <iostream>
+#include "read_csv.h"
 #include <cmath>
-#include <cstdlib>
+#include <algorithm>
+#include <random>
 
-using namespace std;
+KNN::KNN() : k(5) {}
+KNN::KNN(int k) : k(k) {}
+KNN::~KNN() {}
 
-/ Método auxiliar para calcular o número de classes
-int calcularNumClasses(int* rotulos, int lines) {
-    int maxClasse = 0;
-    for (int i = 0; i < lines; i++) {
-        if (rotulos[i] > maxClasse) {
-            maxClasse = rotulos[i];
-        }
-    }
-    return maxClasse + 1; // Classes começam de 0
+void KNN::fit(const vector<vector<float>> &data, const vector<int> &labels) {
+    training_data = data;
+    training_labels = labels;
 }
 
-// Método fit: armazena dados de treino e rótulos
-void KNNModel::fit(float** data, int* rot, int lines, int cols) {
-    this->linesTreino = lines;
-    this->cols = cols;
+void KNN::fit_from_files(const string &data_file, const string &label_file) {
+    read_csv data_reader(data_file, "float");
+    read_csv label_reader(label_file, "int");
 
-    treino = new float*[lines];
-    for (int i = 0; i < lines; i++) {
-        treino[i] = new float[cols];
-        for (int j = 0; j < cols; j++) {
-            treino[i][j] = data[i][j];
+    data_reader.toList(1);
+    label_reader.toList(1);
+
+    int rows = data_reader.get_nbrLines();
+    int cols = data_reader.get_nbrCols();
+
+    float **data_matrix = data_reader.get_floatMatrix();
+    int **label_matrix = label_reader.get_intMatrix();
+
+    training_data.resize(rows, vector<float>(cols));
+    training_labels.resize(rows);
+
+    for (int i = 0; i < rows; ++i) {
+        for (int j = 0; j < cols; ++j) {
+            training_data[i][j] = data_matrix[i][j];
         }
+        training_labels[i] = label_matrix[i][0];
     }
-
-    rotTreino = new int[lines];
-    for (int i = 0; i < lines; i++) {
-        rotTreino[i] = rot[i];
-    }
-
-    // Calcula o número de classes únicas
-    numClasses = calcularNumClasses(rotTreino, lines);
 }
 
-// Método predict: classifica exemplos no conjunto de teste
-int* KNNModel::predict(float** teste, int linesTeste) {
-    int* predicoes = new int[linesTeste];
+void KNN::split_data(float test_ratio) {
+    int total_size = training_data.size();
+    int test_size = static_cast<int>(total_size * test_ratio);
 
-    for (int i = 0; i < linesTeste; i++) {
-        // Inicializa os arrays de vizinhos com os primeiros k pontos
-        float* kDistancias = new float[k];
-        int* kIndices = new int[k];
+    vector<int> indices(total_size);
+    for (int i = 0; i < total_size; ++i) {
+        indices[i] = i;
+    }
 
-        for (int n = 0; n < k; n++) {
-            float soma = 0;
-            for (int c = 0; c < cols; c++) {
-                soma += pow(teste[i][c] - treino[n][c], 2);
-            }
-            kDistancias[n] = sqrt(soma);
-            kIndices[n] = n;
+    std::random_device rd;
+    std::mt19937 g(rd());
+    std::shuffle(indices.begin(), indices.end(), g);
+
+    test_data.clear();
+    test_labels.clear();
+
+    for (int i = 0; i < test_size; ++i) {
+        test_data.push_back(training_data[indices[i]]);
+        test_labels.push_back(training_labels[indices[i]]);
+    }
+
+    vector<vector<float>> new_training_data;
+    vector<int> new_training_labels;
+
+    for (int i = test_size; i < total_size; ++i) {
+        new_training_data.push_back(training_data[indices[i]]);
+        new_training_labels.push_back(training_labels[indices[i]]);
+    }
+
+    training_data = std::move(new_training_data);
+    training_labels = std::move(new_training_labels);
+}
+
+vector<int> KNN::predict(const vector<vector<float>> &data) {
+    vector<int> predictions;
+
+    for (const auto &example : data) {
+        vector<std::pair<float, int>> distances;
+
+        for (size_t i = 0; i < training_data.size(); ++i) {
+            float dist = calculate_distance(example, training_data[i]);
+            distances.push_back({dist, training_labels[i]});
         }
 
-        // Processa os restantes pontos
-        for (int j = k; j < linesTreino; j++) {
-            float soma = 0;
-            for (int c = 0; c < cols; c++) {
-                soma += pow(teste[i][c] - treino[j][c], 2);
-            }
-            float distancia = sqrt(soma);
+        std::sort(distances.begin(), distances.end());
 
-            // Substitui a maior das k distâncias se a atual for menor
-            int maxIdx = 0;
-            for (int n = 1; n < k; n++) {
-                if (kDistancias[n] > kDistancias[maxIdx]) {
-                    maxIdx = n;
+        vector<int> votes(k);
+        for (int i = 0; i < k; ++i) {
+            votes[i] = distances[i].second;
+        }
+
+        std::sort(votes.begin(), votes.end());
+        int majority_label = votes[0];
+        int max_count = 1, current_count = 1;
+
+        for (size_t i = 1; i < votes.size(); ++i) {
+            if (votes[i] == votes[i - 1]) {
+                current_count++;
+                if (current_count > max_count) {
+                    max_count = current_count;
+                    majority_label = votes[i];
                 }
-            }
-            if (distancia < kDistancias[maxIdx]) {
-                kDistancias[maxIdx] = distancia;
-                kIndices[maxIdx] = j;
+            } else {
+                current_count = 1;
             }
         }
 
-        // Votações
-        int* votos = new int[numClasses]();
-        for (int n = 0; n < k; n++) {
-            int classe = rotTreino[kIndices[n]];
-            votos[classe]++;
-        }
-
-        // Determina a classe com mais votos
-        int classe = -1;
-        int maxVotos = 0;
-        for (int c = 0; c < numClasses; c++) {
-            if (votos[c] > maxVotos) {
-                maxVotos = votos[c];
-                classe = c;
-            }
-        }
-        predicoes[i] = classe;
-
-        delete[] kDistancias;
-        delete[] kIndices;
-        delete[] votos;
+        predictions.push_back(majority_label);
     }
 
-    return predicoes;
+    return predictions;
 }
+
+vector<int> KNN::predict_test() {
+    return predict(test_data);
+}
+
+const vector<int>& KNN::get_test_labels() const {
+    return test_labels;
+}
+
+float KNN::calculate_accuracy(const vector<int> &predictions, const vector<int> &true_labels) {
+    if (predictions.size() != true_labels.size()) {
+        throw std::invalid_argument("Predictions and true labels must have the same size");
+    }
+
+    int correct_count = 0;
+    for (size_t i = 0; i < predictions.size(); ++i) {
+        if (predictions[i] == true_labels[i]) {
+            correct_count++;
+        }
+    }
+
+    return static_cast<float>(correct_count) / predictions.size();
+}
+
+float KNN::calculate_distance(const vector<float> &a, const vector<float> &b) {
+    float sum = 0.0;
+    for (size_t i = 0; i < a.size(); ++i) {
+        sum += (a[i] - b[i]) * (a[i] - b[i]);
+    }
+    return std::sqrt(sum);
+}
+
